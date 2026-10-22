@@ -29,6 +29,21 @@ jobs:
         run: flutter create --platforms=android --project-name for_you_store for_you_store
       - name: Copy store app code
         run: cp lib/main.dart for_you_store/lib/main.dart
+      - name: Replace generated template test
+        working-directory: for_you_store
+        run: |
+          cat > test/widget_test.dart <<'EOF'
+          import 'package:flutter_test/flutter_test.dart';
+          import 'package:for_you_store/main.dart';
+
+          void main() {
+            testWidgets('For You storefront renders', (tester) async {
+              await tester.pumpWidget(const ForYouApp());
+              expect(find.text('For You'), findsOneWidget);
+              expect(find.text('تسوق حسب القسم'), findsOneWidget);
+            });
+          }
+          EOF
       - name: Set app display name
         working-directory: for_you_store
         run: |
@@ -38,6 +53,9 @@ jobs:
       - name: Analyze
         working-directory: for_you_store
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      - name: Test
+        working-directory: for_you_store
+        run: flutter test
       - name: Build release APK
         working-directory: for_you_store
         run: flutter build apk --release
