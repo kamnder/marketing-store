@@ -171,7 +171,7 @@ class _StoreHomeState extends State<StoreHome> {
                 onPressed: cart.isEmpty ? null : () { Navigator.pop(sheetContext); _showCheckout(); },
                 style: FilledButton.styleFrom(backgroundColor: ink, foregroundColor: Colors.white, padding: const EdgeInsets.all(14)),
                 child: const Text('إتمام الطلب'))),
-            ])))));
+            ]))))));
   }
 
   void _showCheckout() {
