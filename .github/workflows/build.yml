@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - "lib/main.dart"
       - ".github/workflows/build.yml"
 
 permissions:
@@ -30,8 +31,10 @@ jobs:
           cache: true
 
       - name: Create Flutter project
-        run: |
-          flutter create --platforms=android --project-name marketing_app marketing_app
+        run: flutter create --platforms=android --project-name marketing_app marketing_app
+
+      - name: Copy Marketing app code
+        run: cp lib/main.dart marketing_app/lib/main.dart
 
       - name: Build APK
         working-directory: marketing_app
@@ -43,3 +46,4 @@ jobs:
           name: Marketing-Android-APK
           path: marketing_app/build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
+          
