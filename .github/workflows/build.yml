@@ -1,5 +1,4 @@
-
-name: Build Marketing Android APK
+name: Build For You Android APK
 
 on:
   workflow_dispatch:
@@ -15,35 +14,38 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
-
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-
-      - name: Create Flutter project
-        run: flutter create --platforms=android --project-name marketing_app marketing_app
-
-      - name: Copy Marketing app code
-        run: cp lib/main.dart marketing_app/lib/main.dart
-
-      - name: Build APK
-        working-directory: marketing_app
+      - name: Create Flutter Android project
+        run: flutter create --platforms=android --project-name for_you_store for_you_store
+      - name: Copy store app code
+        run: cp lib/main.dart for_you_store/lib/main.dart
+      - name: Set app display name
+        working-directory: for_you_store
+        run: |
+          sed -i 's/android:label="for_you_store"/android:label="For You"/' android/app/src/main/AndroidManifest.xml
+          sed -i 's/android:label="for_you_store"/android:label="For You"/' android/app/src/debug/AndroidManifest.xml || true
+          sed -i 's/android:label="for_you_store"/android:label="For You"/' android/app/src/profile/AndroidManifest.xml || true
+      - name: Analyze
+        working-directory: for_you_store
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      - name: Build release APK
+        working-directory: for_you_store
         run: flutter build apk --release
-
-      - name: Upload APK
+      - name: Verify APK exists
+        run: test -s for_you_store/build/app/outputs/flutter-apk/app-release.apk
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Marketing-Android-APK
-          path: marketing_app/build/app/outputs/flutter-apk/app-release.apk
+          name: For-You-Android-APK
+          path: for_you_store/build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
-          
