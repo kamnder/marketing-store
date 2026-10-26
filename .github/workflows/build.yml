@@ -26,10 +26,39 @@ jobs:
           channel: stable
           cache: true
       - name: Create Flutter Android project
-        run: flutter create --platforms=android --project-name for_you_store for_you_store
+        run: flutter create --platforms=android --org com.example --project-name foryoustore for_you_store
       - name: Add WhatsApp link dependency
         working-directory: for_you_store
         run: flutter pub add url_launcher
+      - name: Configure Firebase and Firestore
+        working-directory: for_you_store
+        run: |
+          test -f ../google-services.json
+          cp ../google-services.json android/app/google-services.json
+          flutter pub add firebase_core cloud_firestore
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          cfg = json.loads(Path("android/app/google-services.json").read_text())
+          client = cfg["client"][0]
+          api_key = client["api_key"][0]["current_key"]
+          app_id = client["client_info"]["mobilesdk_app_id"]
+          project_id = cfg["project_info"]["project_id"]
+          sender_id = cfg["project_info"]["project_number"]
+          bucket = cfg["project_info"].get("storage_bucket", "")
+          source = """import 'package:firebase_core/firebase_core.dart';
+          class DefaultFirebaseOptions {
+            static const FirebaseOptions android = FirebaseOptions(
+              apiKey: %s,
+              appId: %s,
+              messagingSenderId: %s,
+              projectId: %s,
+              storageBucket: %s,
+            );
+          }
+          """ % tuple(json.dumps(v) for v in (api_key, app_id, sender_id, project_id, bucket))
+          Path("lib/firebase_options.dart").write_text(source)
+          PY
       - name: Create For You gold logo and app icon
         working-directory: for_you_store
         run: |
