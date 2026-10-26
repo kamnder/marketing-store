@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -32,8 +34,140 @@ class ForYouApp extends StatelessWidget {
     theme: ThemeData(useMaterial3: true, scaffoldBackgroundColor: cream,
       colorScheme: ColorScheme.fromSeed(seedColor: gold, primary: ink),
       appBarTheme: const AppBarTheme(backgroundColor: cream, foregroundColor: ink)),
-    home: const StoreHome(),
+    home: const AnimatedSplash(),
   );
+}
+
+class AnimatedSplash extends StatefulWidget {
+  const AnimatedSplash({super.key});
+  @override
+  State<AnimatedSplash> createState() => _AnimatedSplashState();
+}
+
+class _AnimatedSplashState extends State<AnimatedSplash> with SingleTickerProviderStateMixin {
+  late final AnimationController _motion = AnimationController(
+    vsync: this, duration: const Duration(seconds: 9),
+  )..repeat();
+
+  @override
+  void initState() {
+    super.initState();
+    Timer(const Duration(seconds: 4), () {
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => const StoreHome(),
+            transitionDuration: const Duration(milliseconds: 700),
+            transitionsBuilder: (_, animation, __, child) =>
+              FadeTransition(opacity: animation, child: child),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _motion.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    body: AnimatedBuilder(
+      animation: _motion,
+      builder: (context, _) => Stack(
+        fit: StackFit.expand,
+        children: [
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft, end: Alignment.bottomRight,
+                colors: [Color(0xFF100804), Color(0xFF321707), Color(0xFF170B05)],
+              ),
+            ),
+          ),
+          CustomPaint(painter: GoldThreadsPainter(_motion.value)),
+          SafeArea(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 142, height: 142,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0xFFD6AC62), width: 1.3),
+                        boxShadow: [BoxShadow(color: gold.withOpacity(.18), blurRadius: 28, spreadRadius: 4)],
+                      ),
+                      child: const Icon(Icons.spa_rounded, color: Color(0xFFF1CD83), size: 92),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text('For You', textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 54, height: 1.1, fontWeight: FontWeight.w500,
+                        letterSpacing: -1.5, color: Color(0xFFF4D28D))),
+                    const SizedBox(height: 14),
+                    const Text('عطور ومستحضرات التجميل', textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 20, color: Color(0xFFE9C991), fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 13),
+                    const Text('B E A U T Y   •   P E R F U M E   •   C A R E',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 10, color: Color(0xFFE9C991), letterSpacing: 1)),
+                    const SizedBox(height: 46),
+                    const SizedBox(width: 22, height: 22,
+                      child: CircularProgressIndicator(strokeWidth: 1.7, color: Color(0xFFE9C991))),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+class GoldThreadsPainter extends CustomPainter {
+  final double progress;
+  GoldThreadsPainter(this.progress);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final colors = [const Color(0xFFFFE4A1), const Color(0xFFD6A34F), const Color(0xFF9A6125)];
+    for (var strand = 0; strand < 12; strand++) {
+      final path = Path();
+      final phase = progress * math.pi * 2 + strand * .24;
+      for (var step = 0; step <= 90; step++) {
+        final t = step / 90;
+        final x = t * size.width;
+        final wave = math.sin(t * math.pi * 2.1 + phase) * size.height * .065;
+        final bend = math.sin(t * math.pi + phase * .55) * size.height * .06;
+        final y = size.height * (strand < 6 ? .13 + strand * .014 : .82 + (strand - 6) * .014)
+          + wave + bend;
+        if (step == 0) { path.moveTo(x, y); } else { path.lineTo(x, y); }
+      }
+      final paint = Paint()
+        ..color = colors[strand % colors.length].withOpacity(strand % 3 == 0 ? .82 : .38)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strand % 4 == 0 ? 1.45 : .65
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = strand % 4 == 0 ? const MaskFilter.blur(BlurStyle.normal, 1.4) : const MaskFilter.blur(BlurStyle.normal, .35);
+      canvas.drawPath(path, paint);
+    }
+    for (var i = 0; i < 18; i++) {
+      final x = ((i * 73.0 + progress * size.width * .45) % size.width);
+      final y = size.height * (.12 + ((i * 37) % 76) / 100);
+      final pulse = .5 + .5 * math.sin(progress * math.pi * 4 + i);
+      final paint = Paint()..color = const Color(0xFFFFD780).withOpacity(.2 + pulse * .65);
+      canvas.drawCircle(Offset(x, y), .7 + pulse * 1.2, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant GoldThreadsPainter oldDelegate) => oldDelegate.progress != progress;
 }
 
 class StoreHome extends StatefulWidget {
