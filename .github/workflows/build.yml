@@ -34,7 +34,7 @@ jobs:
         working-directory: for_you_store
         run: |
           sudo apt-get update
-          sudo apt-get install -y imagemagick
+          sudo apt-get install -y librsvg2-bin
           mkdir -p assets
           cat > assets/for_you_logo.svg <<'EOF'
           <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
@@ -76,7 +76,9 @@ jobs:
             <path d="M270 830 Q512 900 754 830" fill="none" stroke="url(#gold)" stroke-width="8" stroke-linecap="round"/>
           </svg>
           EOF
-          convert -background none assets/for_you_logo.svg -resize 1024x1024 assets/for_you_logo.png
+          rsvg-convert --width 1024 --height 1024 assets/for_you_logo.svg > assets/for_you_logo.png
+          test -s assets/for_you_logo.png
+          file assets/for_you_logo.png
           cat >> pubspec.yaml <<'EOF'
 
           flutter_launcher_icons:
