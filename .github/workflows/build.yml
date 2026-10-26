@@ -83,8 +83,8 @@ jobs:
           from pathlib import Path
           p = Path("pubspec.yaml")
           s = p.read_text()
-          needle = "flutter:\\n  uses-material-design: true"
-          replacement = "flutter:\\n  uses-material-design: true\\n  assets:\\n    - assets/for_you_logo.png"
+          needle = "flutter:\n  uses-material-design: true"
+          replacement = "flutter:\n  uses-material-design: true\n  assets:\n    - assets/for_you_logo.png"
           if needle not in s:
               raise SystemExit("Could not find Flutter assets section in pubspec.yaml")
           p.write_text(s.replace(needle, replacement, 1))
