@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "547785586810",
+    "project_id": "for-you-80c62",
+    "storage_bucket": "for-you-80c62.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547785586810:android:3c5eaa0609d962029663c3",
+        "android_client_info": {
+          "package_name": "com.example.foryoustore"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRyGIp0JzJgT0ruwn8Nzs_0BcvyjxYFRY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
