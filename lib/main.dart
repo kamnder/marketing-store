@@ -199,12 +199,12 @@ class _StoreHomeState extends State<StoreHome> {
           FilledButton(onPressed: () async {
             if (!formKey.currentState!.validate()) return;
             final orderLines = cart.entries.map((e) =>
-              '- ${e.key.name} × ${e.value} = ${e.key.price * e.value} ج.م').join('\\n');
-            final message = 'طلب جديد من متجر For You\\n'
-              'الاسم: ${name.text.trim()}\\n'
-              'هاتف العميل: ${phone.text.trim()}\\n'
-              'عنوان التوصيل: ${address.text.trim()}\\n'
-              'المنتجات والكميات:\\n$orderLines\\n'
+              '- ${e.key.name} × ${e.value} = ${e.key.price * e.value} ج.م').join('\n');
+            final message = 'طلب جديد من متجر For You\n'
+              'الاسم: ${name.text.trim()}\n'
+              'هاتف العميل: ${phone.text.trim()}\n'
+              'عنوان التوصيل: ${address.text.trim()}\n'
+              'المنتجات والكميات:\n$orderLines\n'
               'الإجمالي: $totalPrice ج.م';
             final uri = Uri.https('wa.me', '/249915121132', {'text': message});
             final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
