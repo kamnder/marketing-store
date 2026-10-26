@@ -27,6 +27,9 @@ jobs:
           cache: true
       - name: Create Flutter Android project
         run: flutter create --platforms=android --project-name for_you_store for_you_store
+      - name: Add WhatsApp link dependency
+        working-directory: for_you_store
+        run: flutter pub add url_launcher
       - name: Copy store app code
         run: cp lib/main.dart for_you_store/lib/main.dart
       - name: Replace generated template test
