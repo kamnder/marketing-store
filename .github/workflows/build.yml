@@ -30,6 +30,64 @@ jobs:
       - name: Add WhatsApp link dependency
         working-directory: for_you_store
         run: flutter pub add url_launcher
+      - name: Create For You gold logo and app icon
+        working-directory: for_you_store
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+          mkdir -p assets
+          cat > assets/for_you_logo.svg <<'EOF'
+          <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+            <defs>
+              <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#fff0ad"/>
+                <stop offset="0.28" stop-color="#f5c75d"/>
+                <stop offset="0.62" stop-color="#b87921"/>
+                <stop offset="0.82" stop-color="#ffe69a"/>
+                <stop offset="1" stop-color="#9b5c18"/>
+              </linearGradient>
+              <radialGradient id="bg" cx="50%" cy="42%" r="80%">
+                <stop offset="0" stop-color="#3a1e0e"/>
+                <stop offset="1" stop-color="#100603"/>
+              </radialGradient>
+              <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="7" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <rect width="1024" height="1024" rx="150" fill="url(#bg)"/>
+            <rect x="18" y="18" width="988" height="988" rx="138" fill="none" stroke="url(#gold)" stroke-width="8"/>
+            <g fill="none" stroke="url(#gold)" stroke-linecap="round" opacity=".62">
+              <path d="M35 250 Q220 175 330 285 T700 280 T990 180" stroke-width="5"/>
+              <path d="M30 800 Q240 700 370 790 T720 790 T995 690" stroke-width="4"/>
+              <path d="M20 290 Q220 210 330 310" stroke-width="2"/>
+              <path d="M700 740 Q850 670 1000 710" stroke-width="2"/>
+            </g>
+            <g transform="translate(512 395)" fill="url(#gold)" stroke="#ffe6a0" stroke-width="4" filter="url(#glow)">
+              <path d="M0 205 C-72 120 -62 38 0 -45 C62 38 72 120 0 205Z"/>
+              <path d="M-15 190 C-160 155 -225 72 -238 -28 C-135 -14 -52 43 -15 190Z"/>
+              <path d="M15 190 C160 155 225 72 238 -28 C135 -14 52 43 15 190Z"/>
+              <path d="M-22 190 C-180 205 -270 150 -320 70 C-210 55 -100 95 -22 190Z"/>
+              <path d="M22 190 C180 205 270 150 320 70 C210 55 100 95 22 190Z"/>
+              <path d="M-8 200 C-72 230 -110 270 -125 315 C-55 290 -20 250 -8 200Z" stroke="none"/>
+              <path d="M8 200 C72 230 110 270 125 315 C55 290 20 250 8 200Z" stroke="none"/>
+            </g>
+            <text x="512" y="790" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="138" font-weight="bold" fill="url(#gold)" stroke="#4d2b0e" stroke-width="2" paint-order="stroke">For You</text>
+            <path d="M270 830 Q512 900 754 830" fill="none" stroke="url(#gold)" stroke-width="8" stroke-linecap="round"/>
+          </svg>
+          EOF
+          convert -background none assets/for_you_logo.svg -resize 1024x1024 assets/for_you_logo.png
+          cat >> pubspec.yaml <<'EOF'
+
+          flutter_launcher_icons:
+            android: true
+            ios: false
+            image_path: assets/for_you_logo.png
+            adaptive_icon_background: "#190D08"
+            adaptive_icon_foreground: assets/for_you_logo.png
+          EOF
+          flutter pub add --dev flutter_launcher_icons
+          dart run flutter_launcher_icons
       - name: Copy store app code
         run: cp lib/main.dart for_you_store/lib/main.dart
       - name: Replace generated template test
