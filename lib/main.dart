@@ -1,9 +1,16 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'firebase_options.dart';
 
-void main() => runApp(const ForYouApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.android);
+  runApp(const ForYouApp());
+}
 
 const ink = Color(0xFF211A19), gold = Color(0xFFB68A45), cream = Color(0xFFFAF6F0), rose = Color(0xFFEAD9D1);
 
@@ -362,6 +369,28 @@ class _StoreHomeState extends State<StoreHome> with SingleTickerProviderStateMix
               'عنوان التوصيل: ${address.text.trim()}\n'
               'المنتجات والكميات:\n$orderLines\n'
               'الإجمالي: $totalPrice ج.م';
+            try {
+              await FirebaseFirestore.instance.collection('orders').add({
+                'customerName': name.text.trim(),
+                'phone': phone.text.trim(),
+                'address': address.text.trim(),
+                'items': cart.entries.map((e) => {
+                  'name': e.key.name,
+                  'category': e.key.category,
+                  'unitPrice': e.key.price,
+                  'quantity': e.value,
+                }).toList(),
+                'total': totalPrice,
+                'currency': 'EGP',
+                'status': 'new',
+                'createdAt': FieldValue.serverTimestamp(),
+              });
+            } catch (_) {
+              if (dialogContext.mounted) {
+                ScaffoldMessenger.of(this.context).showSnackBar(
+                  const SnackBar(content: Text('تعذر حفظ الطلب في قاعدة البيانات؛ سيتم فتح واتساب لإكمال الطلب.')));
+              }
+            }
             final uri = Uri.https('wa.me', '/249915121132', {'text': message});
             final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
             if (!opened) {
