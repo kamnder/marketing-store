@@ -176,7 +176,16 @@ class StoreHome extends StatefulWidget {
   State<StoreHome> createState() => _StoreHomeState();
 }
 
-class _StoreHomeState extends State<StoreHome> {
+class _StoreHomeState extends State<StoreHome> with SingleTickerProviderStateMixin {
+  late final AnimationController _backgroundMotion = AnimationController(
+    vsync: this, duration: const Duration(seconds: 12),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _backgroundMotion.dispose();
+    super.dispose();
+  }
   String category = 'الكل', search = '';
   final Map<Product, int> cart = {};
   final categories = const ['الكل', 'عطور', 'العناية بالبشرة', 'مستحضرات التجميل', 'هدايا'];
@@ -189,7 +198,12 @@ class _StoreHomeState extends State<StoreHome> {
       (category == 'الكل' || p.category == category) &&
       (p.name.contains(search) || p.category.contains(search))).toList();
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
-      appBar: AppBar(title: const Row(children: [
+      appBar: AppBar(
+      backgroundColor: const Color(0xFF170B05),
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      foregroundColor: const Color(0xFFF4D28D),
+      title: const Row(children: [
         Icon(Icons.local_florist, color: gold, size: 27), SizedBox(width: 8),
         Text('For You', style: TextStyle(fontSize: 25, fontWeight: FontWeight.w800)),
       ]), actions: [
@@ -198,7 +212,13 @@ class _StoreHomeState extends State<StoreHome> {
             child: const Icon(Icons.shopping_bag_outlined, size: 27))),
         const SizedBox(width: 8),
       ]),
-      body: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 28), children: [
+      body: Stack(fit: StackFit.expand, children: [
+        const DecoratedBox(decoration: BoxDecoration(
+          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
+            colors: [Color(0xFF100804), Color(0xFF321707), Color(0xFF170B05)]))),
+        AnimatedBuilder(animation: _backgroundMotion, builder: (context, _) =>
+          CustomPaint(painter: GoldThreadsPainter(_backgroundMotion.value))),
+        ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 28), children: [
         Container(padding: const EdgeInsets.all(22), decoration: BoxDecoration(
           gradient: const LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft,
             colors: [Color(0xFF332320), Color(0xFF795848)]),
@@ -219,7 +239,7 @@ class _StoreHomeState extends State<StoreHome> {
             filled: true, fillColor: Colors.white, contentPadding: const EdgeInsets.symmetric(vertical: 15),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none))),
         const SizedBox(height: 22),
-        const Text('تسوق حسب القسم', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: ink)),
+        const Text('تسوق حسب القسم', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: const Color(0xFFF8E8CB))),
         const SizedBox(height: 12),
         SizedBox(height: 43, child: ListView(scrollDirection: Axis.horizontal,
           children: categories.map((c) => Padding(padding: const EdgeInsets.only(left: 8),
@@ -227,8 +247,8 @@ class _StoreHomeState extends State<StoreHome> {
               selectedColor: const Color(0xFFE8D6B8), onSelected: (_) => setState(() => category = c)))).toList())),
         const SizedBox(height: 22),
         Row(children: [const Expanded(child: Text('اختيارات For You',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: ink))),
-          Text('${shown.length} منتجات', style: const TextStyle(color: Colors.black54))]),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFF8E8CB)))),
+          Text('${shown.length} منتجات', style: const TextStyle(color: Color(0xFFD9C8B2)))]),
         const SizedBox(height: 14),
         if (shown.isEmpty) const Padding(padding: EdgeInsets.all(28),
           child: Center(child: Text('لا توجد منتجات مطابقة للبحث'))),
@@ -268,8 +288,9 @@ class _StoreHomeState extends State<StoreHome> {
               ]));
           }),
         const SizedBox(height: 20),
-        const Center(child: Text('For You • جمالك يبدأ من اختيارك',
-          style: TextStyle(color: Colors.black45, fontSize: 12))),
+        const Center(child: Text('جمالك يبدأ من اختيارك',
+          style: TextStyle(color: Color(0xFFD9C8B2), fontSize: 12))),
+        ]),
       ]),
     ));
   }
