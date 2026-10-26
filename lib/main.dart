@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() => runApp(const ForYouApp());
 
@@ -195,16 +196,27 @@ class _StoreHomeState extends State<StoreHome> {
         ]))),
         actions: [
           TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('إلغاء')),
-          FilledButton(onPressed: () {
+          FilledButton(onPressed: () async {
             if (!formKey.currentState!.validate()) return;
-            Navigator.pop(dialogContext);
-            showDialog(context: this.context, builder: (ctx) => Directionality(textDirection: TextDirection.rtl,
-              child: AlertDialog(icon: const Icon(Icons.check_circle_outline, color: gold, size: 42),
-                title: const Text('تم تجهيز بيانات الطلب'),
-                content: Text('شكراً ${name.text.trim()}! تم إدخال بيانات الطلب على هذا الجهاز.\n\nلم يُرسل الطلب إلى المتجر بعد؛ يلزم ربط رقم واتساب المتجر أو قاعدة بيانات لاستلام الطلبات فعلياً.'),
-                actions: [FilledButton(onPressed: () { setState(() => cart.clear()); Navigator.pop(ctx); },
-                  child: const Text('حسناً'))])));
-          }, child: const Text('تأكيد البيانات')),
+            final orderLines = cart.entries.map((e) =>
+              '- ${e.key.name} × ${e.value} = ${e.key.price * e.value} ج.م').join('\\n');
+            final message = 'طلب جديد من متجر For You\\n'
+              'الاسم: ${name.text.trim()}\\n'
+              'هاتف العميل: ${phone.text.trim()}\\n'
+              'عنوان التوصيل: ${address.text.trim()}\\n'
+              'المنتجات والكميات:\\n$orderLines\\n'
+              'الإجمالي: $totalPrice ج.م';
+            final uri = Uri.https('wa.me', '/249915121132', {'text': message});
+            final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+            if (!opened) {
+              if (dialogContext.mounted) {
+                ScaffoldMessenger.of(this.context).showSnackBar(
+                  const SnackBar(content: Text('تعذر فتح واتساب. تأكد من تثبيته واتصالك بالإنترنت.')));
+              }
+              return;
+            }
+            if (dialogContext.mounted) Navigator.pop(dialogContext);
+          }, child: const Text('إرسال الطلب عبر واتساب')),
         ],
       )));
   }
