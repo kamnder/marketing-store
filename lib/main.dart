@@ -97,18 +97,19 @@ class _AnimatedSplashState extends State<AnimatedSplash> with SingleTickerProvid
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 142, height: 142,
+                      width: 260, height: 260,
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFFD6AC62), width: 1.3),
-                        boxShadow: [BoxShadow(color: gold.withOpacity(.18), blurRadius: 28, spreadRadius: 4)],
+                        color: const Color(0xFF190D08),
+                        borderRadius: BorderRadius.circular(28),
+                        border: Border.all(color: const Color(0xFFD6AC62), width: 1.4),
+                        boxShadow: [BoxShadow(color: const Color(0xFFD6AC62).withOpacity(.22), blurRadius: 30, spreadRadius: 3)],
                       ),
-                      child: const Icon(Icons.spa_rounded, color: Color(0xFFF1CD83), size: 92),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset('assets/for_you_logo.png', fit: BoxFit.contain),
+                      ),
                     ),
-                    const SizedBox(height: 20),
-                    const Text('For You', textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 54, height: 1.1, fontWeight: FontWeight.w500,
-                        letterSpacing: -1.5, color: Color(0xFFF4D28D))),
                     const SizedBox(height: 14),
                     const Text('عطور ومستحضرات التجميل', textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 20, color: Color(0xFFE9C991), fontWeight: FontWeight.w600)),
